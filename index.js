@@ -24,15 +24,15 @@ sock.on('message', function (topic, message) {
         // 3. get the transactions from the block
         const txs = decodedBlock.transactions;
         txs.forEach(tx => {
-            // check if it's a coinbase transaction
-            if (tx.isCoinbase()) {
-                console.log('found coinbase transaction', tx.getId());
-            } else {
-                // get the output of the transaction
-                console.log(tx.outs);
-
-                // check if it has OP_RETURN
-            }
-        });
+            console.log('tx', tx.getId());
+            tx.outs.forEach(out => {
+                const ASM = bitcoin.script.toASM(out.script);
+                if(ASM.includes('OP_RETURN')) {
+                    const text = ASM.split('OP_RETURN ')[1];
+                    const output = Buffer.from(text, 'hex');
+                    console.log(output.toString());
+                }
+            })
+        })
     }
 });
