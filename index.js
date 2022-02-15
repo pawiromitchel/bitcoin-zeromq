@@ -1,18 +1,31 @@
-var bitcoin = require('bitcoinjs-lib');
-var zmq = require('zeromq');
+const zmq = require('zeromq')
+const sock = zmq.socket('sub')
+const RpcClient = require('bitcoind-rpc');
+const bitcoin = require('bitcoinjs-lib');
 
-// create the socket connection
-var sock = zmq.socket('sub');
-var addr = 'tcp://127.0.0.1:3000';
+const config = {
+  protocol: 'http',
+  user: 'bitcoin',
+  pass: 'bitcoin',
+  host: '127.0.0.1',
+  port: '8332',
+};
 
-sock.connect(addr);
-sock.subscribe('rawtx');
-
+const RPC = new RpcClient(config);
+sock.connect('tcp://127.0.0.1:3000');
+sock.subscribe('raw')
 sock.on('message', function(topic, message) {
-    if (topic.toString() === 'rawtx') {
-        var rawTx = message.toString('hex');
-        console.log('received transaction hex', rawTx);
-    } else {
-        console.log('received unknown topic', topic.toString());
-    }
+  if (topic == 'rawtx') {
+    const rawTx = message.toString('hex');
+    const tx = bitcoin.Transaction.fromHex(rawTx);
+    const txid = tx.getId();
+    console.log('received transaction', txid, tx);
+  }
+
+  if (topic == 'rawblock') {
+    const rawTx = message.toString('hex');
+    const tx = bitcoin.Block.fromHex(rawTx);
+    const txid = tx.getId();
+    console.log('received block', txid, tx);
+  }
 });
