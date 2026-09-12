@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "bitcoind-rpc": "^0.9.1",
-    "bitcoinjs-lib": "^6.0.1",
+    "bitcoinjs-lib": "^7.0.0",
     "zeromq": "^5.2.8"
   }
 }
